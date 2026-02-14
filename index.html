@@ -6,114 +6,137 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-    body {
-        margin: 0;
-        font-family: 'Georgia', serif;
-        background: linear-gradient(135deg, #0f4c81, #1e90ff);
-        color: #fff;
-        text-align: center;
-        min-height: 100vh;
-        overflow-x: hidden;
-    }
+body {
+    margin: 0;
+    font-family: 'Georgia', serif;
+    background: linear-gradient(135deg, #0f4c81, #1e90ff);
+    color: #fff;
+    text-align: center;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
 
-    h1 {
-        margin-top: 40px;
-        font-size: 2.2em;
-        animation: fadeIn 2s ease;
-    }
+/* TITLE */
+h1 {
+    margin-top: 40px;
+    font-size: 2.2em;
+    animation: fadeIn 2s ease forwards;
+}
 
-    p {
-        font-size: 1.1em;
-        margin: 15px 25px;
-        line-height: 1.6;
-    }
+p {
+    margin: 15px 25px;
+    line-height: 1.6;
+}
 
-    .game {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 15px;
-        max-width: 300px;
-        margin: 40px auto;
-    }
+/* GAME GRID */
+.game {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    max-width: 300px;
+    margin: 40px auto;
+}
 
-    .card {
-        background: rgba(255,255,255,0.2);
-        border-radius: 15px;
-        padding: 25px;
-        font-size: 30px;
-        cursor: pointer;
-        transition: transform 0.3s, background 0.3s;
-    }
+.card {
+    background: rgba(255,255,255,0.2);
+    border-radius: 15px;
+    padding: 25px;
+    font-size: 30px;
+    cursor: pointer;
+    transition: 0.3s;
+}
 
-    .card:hover {
-        transform: scale(1.1);
-        background: rgba(255,255,255,0.35);
-    }
+.card:hover {
+    transform: scale(1.1);
+    background: rgba(255,255,255,0.35);
+}
 
-    .message {
-        margin-top: 20px;
-        font-size: 1em;
-        min-height: 30px;
-    }
+/* LETTER */
+.letter {
+    display: none;
+    background: rgba(255,255,255,0.12);
+    border-radius: 25px;
+    padding: 30px;
+    margin: 40px 20px;
+    backdrop-filter: blur(10px);
+    opacity: 0;
+    transform: translateY(40px);
+    transition: 1.5s ease;
+}
 
-    .letter {
-        display: none;
-        background: rgba(255,255,255,0.15);
-        border-radius: 20px;
-        padding: 30px;
-        margin: 40px 20px;
-        animation: fadeIn 2s ease;
-    }
+.letter.show {
+    opacity: 1;
+    transform: translateY(0);
+}
 
-    .signature {
-        margin-top: 30px;
-        font-style: italic;
-        font-size: 1.1em;
-    }
+/* GALLERY */
+.gallery {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-top: 30px;
+    opacity: 0;
+    transform: translateY(40px);
+    transition: 1.8s ease;
+}
 
-    .music-box {
-        display: none;
-        margin-top: 25px;
-    }
+.gallery.show {
+    opacity: 1;
+    transform: translateY(0);
+}
 
-    .music-btn {
-        background: rgba(255,255,255,0.25);
-        border: none;
-        color: #fff;
-        padding: 12px 20px;
-        font-size: 16px;
-        border-radius: 30px;
-        cursor: pointer;
-    }
+.gallery img {
+    width: 180px;
+    height: 230px;
+    object-fit: cover;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    transition: 0.5s;
+}
 
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
+.gallery img:hover {
+    transform: scale(1.05);
+}
 
-    .float {
-        position: fixed;
-        top: -50px;
-        animation: fall 8s linear infinite;
-        opacity: 0.8;
-        pointer-events: none;
-    }
+/* BUTTON */
+.music-btn {
+    margin-top: 25px;
+    padding: 12px 24px;
+    border-radius: 30px;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    background: rgba(255,255,255,0.3);
+    color: #fff;
+}
 
-    @keyframes fall {
-        from { transform: translateY(0); }
-        to { transform: translateY(110vh); }
-    }
+/* FALLING EFFECT */
+.fall {
+    position: fixed;
+    top: -30px;
+    animation: falling 8s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes falling {
+    to { transform: translateY(110vh); opacity: 0; }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
 </style>
 </head>
 
 <body>
 
 <h1>Before the letter… 💌</h1>
-<p>One heart here is real.<br>
-Find it — just like I found you.</p>
+<p>One heart here is real.<br>Find it — just like I found you.</p>
 
 <div class="game" id="game"></div>
-<div class="message" id="message"></div>
+<p id="msg"></p>
 
 <div class="letter" id="letter">
 
@@ -154,78 +177,87 @@ I’m always here, loving you quietly,
 until you’re smiling again.
 </p>
 
-<div class="music-box" id="musicBox">
-    <button class="music-btn" onclick="toggleMusic()">
-        ▶ Play Our Music
-    </button>
+<!-- GALLERY -->
+<div class="gallery" id="gallery">
+    <img src="foto1.jpg">
+    <img src="foto2.jpg">
+    <img src="foto3.jpg">
 </div>
 
-<div class="signature">
-    With all my heart,<br>❤️
+<button class="music-btn" onclick="toggleMusic()" id="musicBtn">
+▶ Play Our Music
+</button>
+
+<div style="margin-top:25px; font-style:italic;">
+With all my heart ❤️
 </div>
 
 </div>
 
-<!-- AUDIO -->
 <audio id="music" src="music.mp3"></audio>
 
 <script>
-    const game = document.getElementById("game");
-    const message = document.getElementById("message");
-    const letter = document.getElementById("letter");
-    const music = document.getElementById("music");
-    const musicBox = document.getElementById("musicBox");
-    const btn = document.querySelector(".music-btn");
+const game = document.getElementById("game");
+const msg = document.getElementById("msg");
+const letter = document.getElementById("letter");
+const gallery = document.getElementById("gallery");
+const music = document.getElementById("music");
+const btn = document.getElementById("musicBtn");
 
-    let correct = Math.floor(Math.random() * 9);
-    let playing = false;
+let correct = Math.floor(Math.random() * 9);
+let playing = false;
 
-    for (let i = 0; i < 9; i++) {
-        const card = document.createElement("div");
-        card.className = "card";
-        card.innerHTML = "🤍";
+// GAME
+for (let i = 0; i < 9; i++) {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = "🤍";
 
-        card.onclick = () => {
-            if (i === correct) {
-                card.innerHTML = "❤️";
-                message.innerHTML = "You found the right heart. Just like you found mine.";
+    card.onclick = () => {
+        if (i === correct) {
+            card.innerHTML = "❤️";
+            msg.innerHTML = "You found the right heart. Just like you found mine.";
+            setTimeout(() => {
+                letter.style.display = "block";
                 setTimeout(() => {
-                    letter.style.display = "block";
-                    musicBox.style.display = "block";
-                    startFalling();
-                }, 1000);
-            } else {
-                card.innerHTML = "💔";
-                message.innerHTML = "Not this one… but I’m glad you’re trying.";
-            }
-        };
-        game.appendChild(card);
-    }
-
-    function toggleMusic() {
-        if (!playing) {
-            music.play();
-            btn.innerHTML = "⏸ Pause Our Music";
-            playing = true;
+                    letter.classList.add("show");
+                    gallery.classList.add("show");
+                }, 100);
+                startFalling();
+            }, 800);
         } else {
-            music.pause();
-            btn.innerHTML = "▶ Play Our Music";
-            playing = false;
+            card.innerHTML = "💔";
+            msg.innerHTML = "Not this one… but I love that you’re trying.";
         }
-    }
+    };
+    game.appendChild(card);
+}
 
-    function startFalling() {
-        setInterval(() => {
-            const el = document.createElement("div");
-            el.className = "float";
-            el.innerHTML = Math.random() > 0.5 ? "❤️" : "🌸";
-            el.style.left = Math.random() * 100 + "vw";
-            el.style.fontSize = Math.random() * 20 + 20 + "px";
-            document.body.appendChild(el);
-
-            setTimeout(() => el.remove(), 8000);
-        }, 300);
+// MUSIC
+function toggleMusic() {
+    if (!playing) {
+        music.play();
+        btn.innerHTML = "⏸ Pause Our Music";
+        playing = true;
+    } else {
+        music.pause();
+        btn.innerHTML = "▶ Play Our Music";
+        playing = false;
     }
+}
+
+// FALLING EFFECT
+function startFalling() {
+    setInterval(() => {
+        const el = document.createElement("div");
+        el.className = "fall";
+        el.innerHTML = Math.random() > 0.5 ? "❤️" : "🌸";
+        el.style.left = Math.random() * 100 + "vw";
+        el.style.fontSize = Math.random() * 20 + 20 + "px";
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 8000);
+    }, 300);
+}
 </script>
 
 </body>
