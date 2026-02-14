@@ -16,19 +16,27 @@ body {
     overflow-x: hidden;
 }
 
-/* TITLE */
+/* Glow overlay */
+.glow {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle, rgba(255,255,255,0.3), transparent 70%);
+    opacity: 0;
+    pointer-events: none;
+    transition: 1.5s ease;
+}
+
+.glow.active {
+    opacity: 1;
+}
+
+/* Title */
 h1 {
     margin-top: 40px;
     font-size: 2.2em;
-    animation: fadeIn 2s ease forwards;
 }
 
-p {
-    margin: 15px 25px;
-    line-height: 1.6;
-}
-
-/* GAME GRID */
+/* Game */
 .game {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -48,20 +56,19 @@ p {
 
 .card:hover {
     transform: scale(1.1);
-    background: rgba(255,255,255,0.35);
 }
 
-/* LETTER */
+/* Letter */
 .letter {
     display: none;
     background: rgba(255,255,255,0.12);
     border-radius: 25px;
     padding: 30px;
     margin: 40px 20px;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(12px);
     opacity: 0;
     transform: translateY(40px);
-    transition: 1.5s ease;
+    transition: 2s ease;
 }
 
 .letter.show {
@@ -69,7 +76,7 @@ p {
     transform: translateY(0);
 }
 
-/* GALLERY */
+/* Gallery */
 .gallery {
     display: flex;
     justify-content: center;
@@ -78,7 +85,7 @@ p {
     margin-top: 30px;
     opacity: 0;
     transform: translateY(40px);
-    transition: 1.8s ease;
+    transition: 2.5s ease;
 }
 
 .gallery.show {
@@ -87,7 +94,7 @@ p {
 }
 
 .gallery img {
-    width: 180px;
+    width: 170px;
     height: 230px;
     object-fit: cover;
     border-radius: 20px;
@@ -99,19 +106,7 @@ p {
     transform: scale(1.05);
 }
 
-/* BUTTON */
-.music-btn {
-    margin-top: 25px;
-    padding: 12px 24px;
-    border-radius: 30px;
-    border: none;
-    font-size: 16px;
-    cursor: pointer;
-    background: rgba(255,255,255,0.3);
-    color: #fff;
-}
-
-/* FALLING EFFECT */
+/* Falling */
 .fall {
     position: fixed;
     top: -30px;
@@ -122,15 +117,12 @@ p {
 @keyframes falling {
     to { transform: translateY(110vh); opacity: 0; }
 }
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
 </style>
 </head>
 
 <body>
+
+<div class="glow" id="glow"></div>
 
 <h1>Before the letter… 💌</h1>
 <p>One heart here is real.<br>Find it — just like I found you.</p>
@@ -177,16 +169,11 @@ I’m always here, loving you quietly,
 until you’re smiling again.
 </p>
 
-<!-- GALLERY -->
 <div class="gallery" id="gallery">
     <img src="foto1.jpg">
     <img src="foto2.jpg">
     <img src="foto3.jpg">
 </div>
-
-<button class="music-btn" onclick="toggleMusic()" id="musicBtn">
-▶ Play Our Music
-</button>
 
 <div style="margin-top:25px; font-style:italic;">
 With all my heart ❤️
@@ -202,12 +189,31 @@ const msg = document.getElementById("msg");
 const letter = document.getElementById("letter");
 const gallery = document.getElementById("gallery");
 const music = document.getElementById("music");
-const btn = document.getElementById("musicBtn");
+const glow = document.getElementById("glow");
 
 let correct = Math.floor(Math.random() * 9);
-let playing = false;
 
-// GAME
+// fade in volume
+function fadeInMusic() {
+    music.volume = 0;
+    music.play();
+    let vol = 0;
+    let fade = setInterval(() => {
+        if (vol < 1) {
+            vol += 0.05;
+            music.volume = vol;
+        } else {
+            clearInterval(fade);
+        }
+    }, 200);
+}
+
+function heartbeatEffect() {
+    glow.classList.add("active");
+    setTimeout(() => glow.classList.remove("active"), 1500);
+}
+
+// game
 for (let i = 0; i < 9; i++) {
     const card = document.createElement("div");
     card.className = "card";
@@ -217,6 +223,10 @@ for (let i = 0; i < 9; i++) {
         if (i === correct) {
             card.innerHTML = "❤️";
             msg.innerHTML = "You found the right heart. Just like you found mine.";
+
+            heartbeatEffect();
+            fadeInMusic();
+
             setTimeout(() => {
                 letter.style.display = "block";
                 setTimeout(() => {
@@ -224,29 +234,18 @@ for (let i = 0; i < 9; i++) {
                     gallery.classList.add("show");
                 }, 100);
                 startFalling();
-            }, 800);
+            }, 1200);
+
         } else {
             card.innerHTML = "💔";
-            msg.innerHTML = "Not this one… but I love that you’re trying.";
+            msg.innerHTML = "Not this one… but I love that you're trying.";
         }
     };
+
     game.appendChild(card);
 }
 
-// MUSIC
-function toggleMusic() {
-    if (!playing) {
-        music.play();
-        btn.innerHTML = "⏸ Pause Our Music";
-        playing = true;
-    } else {
-        music.pause();
-        btn.innerHTML = "▶ Play Our Music";
-        playing = false;
-    }
-}
-
-// FALLING EFFECT
+// falling effect
 function startFalling() {
     setInterval(() => {
         const el = document.createElement("div");
